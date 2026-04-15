@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="M_PI" value="3.14159"/>
+
+  <xacro:macro name="Livox_Mid_gazebo_sensor"
+               params="name:=livox">
+
+    <gazebo reference="${name}">
+      <sensor type="ray" name="laser_livox">
+        <pose>0 0 0.05 0 0 0</pose>
+        <visualize>false</visualize>
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+
+        <plugin name="gazebo_ros_laser_controller" filename="liblivox_laser_simulation.so">
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>100</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.1415926535897931</min_angle>
+                <max_angle>3.1415926535897931</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>50</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.1415926535897931</min_angle>
+                <max_angle>3.1415926535897931</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>0.1</min>
+              <max>40</max>
+              <resolution>1</resolution>
+            </range>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.0</stddev>
+            </noise>
+          </ray>
+
+          <visualize>True</visualize>
+          <samples>20000</samples>
+          <downsample>1</downsample>
+          <csv_file_name>mid360-real-centr.csv</csv_file_name>
+          <publish_pointcloud_type>2</publish_pointcloud_type>
+          <ros_topic>/livox/lidar</ros_topic>
+          <frameName>base_link</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="Livox_Mid360" params="name:=livox">
+    <link name="${name}">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.1"/>
+        <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
+                 iyy="0.0001" iyz="0.0"
+                 izz="0.0001"/>
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://livox_laser_simulation/meshes/livox_mid-360-90x.dae"
+                scale="0.5 0.5 0.5"/>
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.05 0.05 0.05"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <xacro:Livox_Mid_gazebo_sensor name="${name}"/>
+  </xacro:macro>
+
+</robot>
